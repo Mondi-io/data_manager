@@ -1,4 +1,4 @@
-FROM openjdk:8u181-jre-alpine
+FROM openjdk:8-jdk-alpine
 
 ARG kafka_version=2.1.0
 ARG scala_version=2.12
@@ -35,9 +35,13 @@ RUN apk add --no-cache bash curl jq docker \
  && rm /tmp/* \
  && wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/${GLIBC_VERSION}/glibc-${GLIBC_VERSION}.apk \
  && apk add --no-cache --allow-untrusted glibc-${GLIBC_VERSION}.apk \
- && rm glibc-${GLIBC_VERSION}.apk
+ && rm glibc-${GLIBC_VERSION}.apk \
+ && mkdir /opt/kafka/tmp
 
 COPY overrides /opt/overrides
+COPY producers/ /opt/kafka/producers/
+
+RUN javac -cp "/opt/kafka/libs/*" /opt/kafka/producers/*.java
 
 VOLUME ["/kafka"]
 
